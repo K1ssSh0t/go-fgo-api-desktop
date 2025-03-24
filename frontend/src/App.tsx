@@ -2,6 +2,7 @@ import { useState } from 'react';
 import logo from './assets/images/logo-universal.png';
 import { Greet } from "../wailsjs/go/main/App";
 import { GetAllCharacters } from "../wailsjs/go/main/App";
+import { Button } from './components/ui/button';
 function App() {
     const [resultText, setResultText] = useState("Please enter your name below 👇");
     const [name, setName] = useState('');
@@ -32,12 +33,13 @@ function App() {
                     type="text"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <button
+                <Button
                     onClick={greet}
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                    variant="default"
+                    size="default"
                 >
-                    Greet
-                </button>
+                    Greet test
+                </Button>
             </div>
             <div id="characters" className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm">
                 <p className="text-lg">Characters: {dato}</p>
