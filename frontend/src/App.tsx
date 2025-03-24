@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import logo from './assets/images/logo-universal.png';
-import './App.css';
 import { Greet } from "../wailsjs/go/main/App";
 import { GetAllCharacters } from "../wailsjs/go/main/App";
 function App() {
@@ -21,15 +20,27 @@ function App() {
     }
 
     return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo" />
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text" />
-                <button className="btn" onClick={greet}>Greet</button>
+        <div id="App" className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
+            <img src={logo} id="logo" alt="logo" className="w-32 h-32 mb-8" />
+            <div id="result" className="text-2xl font-semibold text-foreground mb-6">{resultText}</div>
+            <div id="input" className="flex gap-4 mb-8">
+                <input
+                    id="name"
+                    onChange={updateName}
+                    autoComplete="off"
+                    name="input"
+                    type="text"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <button
+                    onClick={greet}
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                >
+                    Greet
+                </button>
             </div>
-            <div id="characters" className="characters">
-                <p>Characters:{dato}</p>
+            <div id="characters" className="p-4 rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+                <p className="text-lg">Characters: {dato}</p>
             </div>
         </div>
     )
