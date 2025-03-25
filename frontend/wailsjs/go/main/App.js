@@ -6,6 +6,10 @@ export function GetAllCharacters() {
   return window['go']['main']['App']['GetAllCharacters']();
 }
 
+export function GetServantDetail(arg1) {
+  return window['go']['main']['App']['GetServantDetail'](arg1);
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
