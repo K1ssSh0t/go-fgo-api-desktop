@@ -31,12 +31,14 @@ import {
     CarouselPrevious,
     type CarouselApi
 } from "./components/ui/carousel";
+import { ThemeProvider } from "./components/theme-provider";
+import { ThemeToggle } from "./components/theme-toggle";
 
 import { main } from "../wailsjs/go/models";
 type Character = main.Character;
 type ServantDetail = main.ServantDetail;
 
-function App() {
+function AppContent() {
     const [characters, setCharacters] = useState<Character[]>([]);
     const [filteredCharacters, setFilteredCharacters] = useState<Character[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -150,6 +152,10 @@ function App() {
 
     return (
         <div id="App" className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
+            <div className="fixed top-4 right-4 z-50">
+                <ThemeToggle />
+            </div>
+
             <Card className="w-full max-w-4xl mb-4">
                 <CardContent className="pt-6">
                     <div className="relative flex items-center mb-4">
@@ -286,6 +292,14 @@ function App() {
             </Dialog>
         </div>
     )
+}
+
+function App() {
+    return (
+        <ThemeProvider defaultTheme="system" storageKey="fgo-ui-theme">
+            <AppContent />
+        </ThemeProvider>
+    );
 }
 
 export default App
