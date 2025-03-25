@@ -29,6 +29,7 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
+    type CarouselApi
 } from "./components/ui/carousel";
 
 import { main } from "../wailsjs/go/models";
@@ -43,6 +44,8 @@ function App() {
     const [selectedServant, setSelectedServant] = useState<ServantDetail | null>(null);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         // Cargar personajes cuando el componente se monte
@@ -59,6 +62,31 @@ function App() {
         }
     }, [searchTerm, characters]);
 
+    // Listen to carousel changes
+    useEffect(() => {
+        if (!carouselApi) {
+            return;
+        }
+
+        const onSelect = () => {
+            setCurrentIndex(carouselApi.selectedScrollSnap());
+        };
+
+        carouselApi.on("select", onSelect);
+        return () => {
+            carouselApi.off("select", onSelect);
+        };
+    }, [carouselApi]);
+
+    // Reset current index when dialog closes
+    useEffect(() => {
+        if (!detailsOpen) {
+            setCurrentIndex(0);
+            // También podemos resetear selectedServant si es necesario
+            // setSelectedServant(null);
+        }
+    }, [detailsOpen]);
+
     function getAllCharacters() {
         setLoading(true);
         GetAllCharacters().then(result => {
@@ -71,6 +99,13 @@ function App() {
     function loadServantDetails(collectionNo: number) {
         setDetailsLoading(true);
         setDetailsOpen(true);
+        // Reset the current index when loading a new servant
+        setCurrentIndex(0);
+        // Reset the carousel to the first position if API is available
+        if (carouselApi) {
+            carouselApi.scrollTo(0);
+        }
+
         GetServantDetail(collectionNo.toString()).then(result => {
             setSelectedServant(result);
             setDetailsLoading(false);
@@ -168,18 +203,29 @@ function App() {
                 </CardContent>
             </Card>
 
-            <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+            <Dialog
+                open={detailsOpen}
+                onOpenChange={(open) => {
+                    setDetailsOpen(open);
+                    if (!open) {
+                        // Al cerrar, resetear el índice
+                        setCurrentIndex(0);
+                        // Opcionalmente, limpiar el personaje seleccionado
+                        // setSelectedServant(null);
+                    }
+                }}
+            >
+                <DialogContent className="sm:max-w-4xl max-h-[98vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="flex justify-between items-center">
+                        <DialogTitle className="flex justify-center items-center">
                             {detailsLoading ?
                                 <Skeleton className="h-8 w-[200px]" /> :
                                 <span>{selectedServant?.name} <span className="text-muted-foreground text-sm">({selectedServant?.originalName})</span></span>
                             }
 
                         </DialogTitle>
-                        <DialogDescription>
-                            {detailsLoading ? <Skeleton className="h-4 w-full mt-2" /> : `Clase: ${selectedServant?.className} ⭐${selectedServant?.rarity}`}
+                        <DialogDescription className="capitalize text-center">
+                            {detailsLoading ? <Skeleton className="h-4 w-full mt-2 " /> : `Clase: ${selectedServant?.className} ⭐${selectedServant?.rarity}`}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -192,7 +238,7 @@ function App() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 text-center">
                                 <div>
                                     <h3 className="font-semibold mb-1">CV</h3>
                                     <p>{selectedServant?.profile?.cv || 'No disponible'}</p>
@@ -206,25 +252,30 @@ function App() {
                             <div>
                                 <h3 className="font-semibold mb-2">Imágenes</h3>
                                 {characterImages().length > 0 ? (
-                                    <Carousel className="w-full">
-                                        <CarouselContent>
-                                            {characterImages().map((img, idx) => (
-                                                <CarouselItem key={idx}>
-                                                    <div className="p-1">
-                                                        <div className="overflow-hidden rounded-md border aspect-square flex items-center justify-center bg-muted/50">
-                                                            <img
-                                                                src={img}
-                                                                alt={`${selectedServant?.name} - Imagen ${idx + 1}`}
-                                                                className="h-[400px] object-contain"
-                                                            />
+                                    <>
+                                        <Carousel className="w-full" setApi={setCarouselApi}>
+                                            <CarouselContent>
+                                                {characterImages().map((img, idx) => (
+                                                    <CarouselItem key={idx}>
+                                                        <div className="p-1">
+                                                            <div className="overflow-hidden rounded-md border flex items-center justify-center bg-muted/10 h-[500px]">
+                                                                <img
+                                                                    src={img}
+                                                                    alt={`${selectedServant?.name} - Imagen ${idx + 1}`}
+                                                                    className="max-h-full max-w-full object-contain"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </CarouselItem>
-                                            ))}
-                                        </CarouselContent>
-                                        <CarouselPrevious />
-                                        <CarouselNext />
-                                    </Carousel>
+                                                    </CarouselItem>
+                                                ))}
+                                            </CarouselContent>
+                                            <CarouselPrevious className="left-2" />
+                                            <CarouselNext className="right-2" />
+                                        </Carousel>
+                                        <div className="text-center text-sm text-muted-foreground mt-2">
+                                            Imagen {currentIndex + 1} de {characterImages().length}
+                                        </div>
+                                    </>
                                 ) : (
                                     <p className="text-muted-foreground">No hay imágenes disponibles</p>
                                 )}
