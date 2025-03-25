@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "./components/ui/avatar";
 import { Skeleton } from "./components/ui/skeleton";
 import { Input } from "./components/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -23,6 +23,13 @@ import {
     DialogDescription,
     DialogClose
 } from "./components/ui/dialog";
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "./components/ui/carousel";
 
 import { main } from "../wailsjs/go/models";
 type Character = main.Character;
@@ -169,9 +176,7 @@ function App() {
                                 <Skeleton className="h-8 w-[200px]" /> :
                                 <span>{selectedServant?.name} <span className="text-muted-foreground text-sm">({selectedServant?.originalName})</span></span>
                             }
-                            <DialogClose className="rounded-full hover:bg-muted p-2">
-                                <X className="h-4 w-4" />
-                            </DialogClose>
+
                         </DialogTitle>
                         <DialogDescription>
                             {detailsLoading ? <Skeleton className="h-4 w-full mt-2" /> : `Clase: ${selectedServant?.className} ⭐${selectedServant?.rarity}`}
@@ -200,17 +205,29 @@ function App() {
 
                             <div>
                                 <h3 className="font-semibold mb-2">Imágenes</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    {characterImages().map((img, idx) => (
-                                        <div key={idx} className="aspect-square rounded-md overflow-hidden border">
-                                            <img
-                                                src={img}
-                                                alt={`${selectedServant?.name} - Imagen ${idx + 1}`}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+                                {characterImages().length > 0 ? (
+                                    <Carousel className="w-full">
+                                        <CarouselContent>
+                                            {characterImages().map((img, idx) => (
+                                                <CarouselItem key={idx}>
+                                                    <div className="p-1">
+                                                        <div className="overflow-hidden rounded-md border aspect-square flex items-center justify-center bg-muted/50">
+                                                            <img
+                                                                src={img}
+                                                                alt={`${selectedServant?.name} - Imagen ${idx + 1}`}
+                                                                className="h-[400px] object-contain"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious />
+                                        <CarouselNext />
+                                    </Carousel>
+                                ) : (
+                                    <p className="text-muted-foreground">No hay imágenes disponibles</p>
+                                )}
                             </div>
                         </div>
                     )}
